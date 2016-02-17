@@ -1,6 +1,69 @@
 # Simple CEF( Chromium Embedded Framework ) DLL
 
-## How to generate 
+This DLL can be used to embed an instance of Chromium browser in a window of your application. Is written in C++ in Win32. Has been tested in Windows XP( 32 bits ) and in Windows 8.1( 64 bits ). Has been embedded in two applications written with Visual Studio C++ 2010 and C++ Builder 2009.
+
+## How to use
+
+The DLL exports four functions:
+
+1. `void SimpleCEFDLL_Initialize( HINSTANCE hInstance );`
+2. `void SimpleCEFDLL_CreateBrowser( HWND hWnd, const wchar_t* url );`
+3. `void SimpleCEFDLL_ResizeBrowser( HWND hWnd );`
+4. `void SimpleCEFDLL_Shutdown( bool terminate );`
+
+### How to use with Visual Studio C++ 2010
+
+You can see the example application Test_SimpleCEFDLL in this repository.
+
+### How to use with C++ Builder 2009
+
+1. You first must typedef de prototypes of your functions:
+
+```C++
+typedef void (*SimpleCEFDLL_Initialize)(HINSTANCE);
+typedef void (*SimpleCEFDLL_CreateBrowser)(HWND,const wchar_t*);
+typedef void (*SimpleCEFDLL_ResizeBrowser)(HWND);
+typedef void (*SimpleCEFDLL_Shutdown)(bool);
+```
+
+2. In the WinMain entry you can write:
+
+```C++
+Application->Initialize();
+
+HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
+SimpleCEFDLL_Initialize fnSimpleCEFDLL_Initialize = (SimpleCEFDLL_Initialize)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Initialize");
+SimpleCEFDLL_Shutdown fnSimpleCEFDLL_Shutdown = (SimpleCEFDLL_Shutdown)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Shutdown");
+
+(*g_SimpleCEFDLL_Initialize)(GetModuleHandle(NULL));
+
+Application->MainFormOnTaskBar = true;
+Application->CreateForm(__classid(TForm1), &Form1);
+
+Application->Run();
+
+(*fnSimpleCEFDLL_Shutdown)(true);
+```
+
+3. Now in the TFormBrowser that you want to show the browser embedded:
+
+```C++
+void __fastcall TFormBrowser::FormCreate(TObject *Sender)
+{
+	HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
+	SimpleCEFDLL_CreateBrowser g_SimpleCEFDLL_CreateBrowser = (SimpleCEFDLL_CreateBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_CreateBrowser");
+	g_SimpleCEFDLL_ResizeBrowser = (SimpleCEFDLL_ResizeBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_ResizeBrowser");
+	String url( "http://www.google.es" );
+	(*g_SimpleCEFDLL_CreateBrowser)(Handle, url.c_str() );
+}
+
+void __fastcall TFormBrowser::FormResize(TObject *Sender)
+{
+	(*g_SimpleCEFDLL_ResizeBrowser)(Handle);
+}
+```
+
+## How to build de DLL
 
 If you want you can go directly to the step 4.
 
@@ -17,5 +80,5 @@ If you want you can go directly to the step 4.
 
 ## Linker options necessaries to build de DLL
 
-1-/NODEFAULTLIB:LIBCMTD
-2-/FORCE:MULTIPLE
+1. /NODEFAULTLIB:LIBCMTD
+2. /FORCE:MULTIPLE
