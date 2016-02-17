@@ -1,0 +1,6 @@
+LIBRARY   SimpleCEFDLL
+EXPORTS
+   SimpleCEFDLL_Initialize		@1
+   SimpleCEFDLL_CreateBrowser   @2
+   SimpleCEFDLL_ResizeBrowser   @3
+   SimpleCEFDLL_Shutdown		@4
