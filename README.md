@@ -51,15 +51,18 @@ Application->Run();
 void __fastcall TFormBrowser::FormCreate(TObject *Sender)
 {
 	HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
-	SimpleCEFDLL_CreateBrowser g_SimpleCEFDLL_CreateBrowser = (SimpleCEFDLL_CreateBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_CreateBrowser");
-	g_SimpleCEFDLL_ResizeBrowser = (SimpleCEFDLL_ResizeBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_ResizeBrowser");
+	SimpleCEFDLL_CreateBrowser fnSimpleCEFDLL_CreateBrowser = (SimpleCEFDLL_CreateBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_CreateBrowser");
+	
+	//This pointer to function can be a member of TFormBrowser
+	m_fnSimpleCEFDLL_ResizeBrowser = (SimpleCEFDLL_ResizeBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_ResizeBrowser");
+	
 	String url( "http://www.google.es" );
-	(*g_SimpleCEFDLL_CreateBrowser)(Handle, url.c_str() );
+	(*fnSimpleCEFDLL_CreateBrowser)(Handle, url.c_str() );
 }
 
 void __fastcall TFormBrowser::FormResize(TObject *Sender)
 {
-	(*g_SimpleCEFDLL_ResizeBrowser)(Handle);
+	(*m_fnSimpleCEFDLL_ResizeBrowser)(Handle);
 }
 ```
 
