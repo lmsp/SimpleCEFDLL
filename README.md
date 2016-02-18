@@ -32,7 +32,8 @@ typedef void (*SimpleCEFDLL_Shutdown)(bool);
 Application->Initialize();
 
 HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
-SimpleCEFDLL_Initialize fnInitialize = (SimpleCEFDLL_Initialize)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Initialize");
+SimpleCEFDLL_Initialize fnInitialize = (SimpleCEFDLL_Initialize)GetProcAddress((HMODULE)hDLL, 
+																				"SimpleCEFDLL_Initialize");
 SimpleCEFDLL_Shutdown fnShutdown = (SimpleCEFDLL_Shutdown)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Shutdown");
 
 (*fnInitialize)(GetModuleHandle(NULL));
