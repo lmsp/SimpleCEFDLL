@@ -32,17 +32,17 @@ typedef void (*SimpleCEFDLL_Shutdown)(bool);
 Application->Initialize();
 
 HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
-SimpleCEFDLL_Initialize fnSimpleCEFDLL_Initialize = (SimpleCEFDLL_Initialize)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Initialize");
-SimpleCEFDLL_Shutdown fnSimpleCEFDLL_Shutdown = (SimpleCEFDLL_Shutdown)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Shutdown");
+SimpleCEFDLL_Initialize fnInitialize = (SimpleCEFDLL_Initialize)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Initialize");
+SimpleCEFDLL_Shutdown fnShutdown = (SimpleCEFDLL_Shutdown)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_Shutdown");
 
-(*g_SimpleCEFDLL_Initialize)(GetModuleHandle(NULL));
+(*fnInitialize)(GetModuleHandle(NULL));
 
 Application->MainFormOnTaskBar = true;
 Application->CreateForm(__classid(TForm1), &Form1);
 
 Application->Run();
 
-(*fnSimpleCEFDLL_Shutdown)(true);
+(*fnShutdown)(true);
 ```
 
 3. Now in the TFormBrowser that you want to show the browser embedded:
@@ -51,18 +51,19 @@ Application->Run();
 void __fastcall TFormBrowser::FormCreate(TObject *Sender)
 {
 	HINSTANCE hDLL = LoadLibrary("SimpleCEFDLL.dll");
-	SimpleCEFDLL_CreateBrowser fnSimpleCEFDLL_CreateBrowser = (SimpleCEFDLL_CreateBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_CreateBrowser");
+	SimpleCEFDLL_CreateBrowser fnCreateBrowser = (SimpleCEFDLL_CreateBrowser)GetProcAddress((HMODULE)hDLL, 
+																				"SimpleCEFDLL_CreateBrowser");
 	
 	//This pointer to function can be a member of TFormBrowser
-	m_fnSimpleCEFDLL_ResizeBrowser = (SimpleCEFDLL_ResizeBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_ResizeBrowser");
+	m_fnResizeBrowser = (SimpleCEFDLL_ResizeBrowser)GetProcAddress((HMODULE)hDLL, "SimpleCEFDLL_ResizeBrowser");
 	
 	String url( "http://www.google.es" );
-	(*fnSimpleCEFDLL_CreateBrowser)(Handle, url.c_str() );
+	(*fnCreateBrowser)(Handle, url.c_str() );
 }
 
 void __fastcall TFormBrowser::FormResize(TObject *Sender)
 {
-	(*m_fnSimpleCEFDLL_ResizeBrowser)(Handle);
+	(*m_fnResizeBrowser)(Handle);
 }
 ```
 
